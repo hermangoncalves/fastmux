@@ -2,7 +2,6 @@ package fastmux
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -10,7 +9,7 @@ import (
 type Context struct {
 	ResponseWriter http.ResponseWriter
 	Request        *http.Request
-	Params         []Param
+	Params         Params
 }
 
 func (ctx *Context) JSON(code int, data any) {
@@ -19,13 +18,14 @@ func (ctx *Context) JSON(code int, data any) {
 	json.NewEncoder(ctx.ResponseWriter).Encode(data)
 }
 
-func (ctx *Context) Param(key string) string {
+func (ctx *Context) Param(key string) (string, bool) {
 	for _, p := range ctx.Params {
 		if p.Key == key {
-			return p.Value
+			return p.Value, true
 		}
 	}
-	return ""
+
+	return "", false
 }
 
 type HandlerFunc func(ctx *Context)
@@ -35,6 +35,8 @@ type Param struct {
 	Key   string
 	Value string
 }
+
+type Params []Param
 
 // route represents a single route
 type route struct {
@@ -46,14 +48,18 @@ type route struct {
 // Fastmux is the main Fastmux structure
 type Fastmux struct {
 	routes   []route
-	notFound http.Handler
+	notFound HandlerFunc
 }
 
 // New creates a new Fastmux
 func New() *Fastmux {
 	return &Fastmux{
-		routes:   make([]route, 0),
-		notFound: http.NotFoundHandler(),
+		routes: make([]route, 0),
+		notFound: func(ctx *Context) {
+			ctx.JSON(http.StatusNotFound, map[string]string{
+				"error": "not found",
+			})
+		},
 	}
 }
 
@@ -125,9 +131,6 @@ func (r *Fastmux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	reqMethod := req.Method
 	reqPath := req.URL.Path
 
-	fmt.Println(reqMethod)
-	fmt.Println(reqPath)
-
 	for _, route := range r.routes {
 		if route.method != reqMethod {
 			continue
@@ -138,10 +141,7 @@ func (r *Fastmux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 	}
-	r.notFound.ServeHTTP(w, req)
-}
 
-// NotFound sets a custom 404 handler
-func (r *Fastmux) NotFound(handler http.Handler) {
-	r.notFound = handler
+	ctx := &Context{ResponseWriter: w, Request: req, Params: nil}
+	r.notFound(ctx)
 }
