@@ -77,29 +77,29 @@ func (r *Fastmux) GET(pattern string, handler HandlerFunc) {
 	r.Handle(http.MethodGet, pattern, handler)
 }
 
-// func (r *Fastmux) POST(pattern string, handle Handle) {
-// 	r.Handle(http.MethodPost, pattern, handle)
-// }
+func (r *Fastmux) POST(pattern string, handler HandlerFunc) {
+	r.Handle(http.MethodPost, pattern, handler)
+}
 
-// func (r *Fastmux) PUT(pattern string, handle Handle) {
-// 	r.Handle(http.MethodPut, pattern, handle)
-// }
+func (r *Fastmux) PUT(pattern string, handler HandlerFunc) {
+	r.Handle(http.MethodPut, pattern, handler)
+}
 
-// func (r *Fastmux) PATCH(pattern string, handle Handle) {
-// 	r.Handle(http.MethodPatch, pattern, handle)
-// }
+func (r *Fastmux) PATCH(pattern string, handler HandlerFunc) {
+	r.Handle(http.MethodPatch, pattern, handler)
+}
 
-// func (r *Fastmux) DELETE(pattern string, handle Handle) {
-// 	r.Handle(http.MethodDelete, pattern, handle)
-// }
+func (r *Fastmux) DELETE(pattern string, handler HandlerFunc) {
+	r.Handle(http.MethodDelete, pattern, handler)
+}
 
-// func (r *Fastmux) HEAD(pattern string, handle Handle) {
-// 	r.Handle(http.MethodHead, pattern, handle)
-// }
+func (r *Fastmux) HEAD(pattern string, handler HandlerFunc) {
+	r.Handle(http.MethodHead, pattern, handler)
+}
 
-// func (r *Fastmux) OPTIONS(pattern string, handle Handle) {
-// 	r.Handle(http.MethodOptions, pattern, handle)
-// }
+func (r *Fastmux) OPTIONS(pattern string, handler HandlerFunc) {
+	r.Handle(http.MethodOptions, pattern, handler)
+}
 
 // matchRoute checks if a pattern matches a path and extracts parameters
 func matchRoute(pattern, path string) (bool, []Param) {
