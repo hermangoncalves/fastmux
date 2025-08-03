@@ -1,6 +1,7 @@
 package fastmux
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -13,6 +14,17 @@ type Param struct {
 
 // Params is a slice of Param
 type Params []Param
+
+// ByName returns the value of the first Param which key matches the given name.
+// If no matching Param is found, an empty string is returned.
+func (ps Params) ByName(name string) string {
+	for _, p := range ps {
+		if p.Key == name {
+			return p.Value
+		}
+	}
+	return ""
+}
 
 // Handle is the handler function type for routes
 type Handle func(http.ResponseWriter, *http.Request, Params)
@@ -91,7 +103,7 @@ func matchRoute(pattern, path string) (bool, Params) {
 		cp := pathParts[i]
 		if strings.HasPrefix(pp, ":") {
 			params = append(params, Param{
-				Key:   pp[1:], // remove leading ':'
+				Key:   pp[1:],
 				Value: cp,
 			})
 		} else if pp != cp {
@@ -106,12 +118,15 @@ func (r *Fastmux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	reqMethod := req.Method
 	reqPath := req.URL.Path
 
-	for _, rt := range r.routes {
-		if rt.method != reqMethod {
+	fmt.Println(reqMethod)
+	fmt.Println(reqPath)
+
+	for _, route := range r.routes {
+		if route.method != reqMethod {
 			continue
 		}
-		if matched, params := matchRoute(rt.pattern, reqPath); matched {
-			rt.handle(w, req, params)
+		if matched, params := matchRoute(route.pattern, reqPath); matched {
+			route.handle(w, req, params)
 			return
 		}
 	}
