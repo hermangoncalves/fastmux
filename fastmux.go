@@ -65,6 +65,18 @@ func New() *Fastmux {
 
 // Handle registers a handler for a specific method and pattern
 func (r *Fastmux) Handle(method, pattern string, handler HandlerFunc) {
+	if method == "" {
+		panic("method must not be empty")
+	}
+
+	if len(pattern) < 1 || pattern[0] != '/' {
+		panic("path must begin with '/' in path '" + pattern + "'")
+	}
+
+	if handler == nil {
+		panic("handler must not be nil")
+	}
+
 	r.routes = append(r.routes, route{
 		method:  strings.ToUpper(method),
 		pattern: pattern,
