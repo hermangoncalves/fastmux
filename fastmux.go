@@ -53,6 +53,8 @@ type Fastmux struct {
 	notFound HandlerFunc
 }
 
+type H map[string]any
+
 // New creates a new Fastmux
 func New() *Fastmux {
 	return &Fastmux{
