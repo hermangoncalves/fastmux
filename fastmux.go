@@ -164,16 +164,9 @@ func (r *Fastmux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	r.notFound(ctx)
 }
 
-func (r *Fastmux) PrintRoutes() {
-	fmt.Println("Registered routes:")
-	for _, route := range r.routes {
-		fmt.Printf("\t[%s] %s\n", route.method, route.pattern)
-	}
-}
 func (r *Fastmux) Run(addr string) error {
 	address := resolveAddress(addr)
-	r.PrintRoutes()
-	fmt.Printf("Listening and serving HTTP on %s\n", address)
+	debugPrint("Server running on %s", address)
 	return http.ListenAndServe(address, r.Handler())
 }
 
