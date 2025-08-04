@@ -1,7 +1,6 @@
 # FastMux - A Simple HTTP Router for Go
 
 **FastMux** is a lightweight HTTP router built with Go's `net/http` package.  
-The name "FastMux" is a playful nod to its simplicity and ease of use, but its primary purpose is **educational** rather than achieving maximum performance.
 
 This library was created to deepen understanding of Go's `net/http` package and to explore the principles of library design in Go.
 
@@ -14,8 +13,6 @@ FastMux is not intended to be the fastest or most performant HTTP router availab
 - **Learning**: To serve as a practical example for studying how to use Go's `net/http` package effectively.
 - **Library Design**: To demonstrate clean and modular design principles for building reusable Go libraries.
 - **Simplicity**: To provide a minimal, easy-to-understand router implementation that supports basic routing functionality.
-
-This makes FastMux an excellent tool for developers who want to learn more about Go's HTTP handling, routing mechanisms, and how to structure a Go library.
 
 ---
 
@@ -52,34 +49,26 @@ import (
 )
 
 func main() {
-	port := "8007"
-	mux := fastmux.New()
+	addr := ":8008"
+	r := fastmux.New()
 
-	// Register a route with a dynamic parameter :name
-	mux.GET("/hello/:name", func(w http.ResponseWriter, r *http.Request, params fastmux.Params) {
-		name := params.ByName("name")
-		fmt.Fprintf(w, "Hello, %s!", name)
+	r.GET("/hello/:name", func(ctx *fastmux.Context) {
+		name, _ := ctx.Param("name")
+		ctx.JSON(http.StatusOK, fastmux.H{
+			"message": name,
+		})
 	})
 
-	fmt.Println("Server starting on :" + port + "...")
-	if err := http.ListenAndServe(":"+port, mux); err != nil {
-		fmt.Printf("Server failed: %v\n", err)
-	}
+	log.Fatal(r.Run(addr))
 }
 
 ```
 
----
 
-## Explanation of the Code
-
-* **Creating a Router**: `fastmux.New()` initializes a new FastMux instance.
-* **Registering Routes**: Use `mux.GET()` or `mux.POST()` to define routes with their respective handlers. You can also use `mux.Handle(method, path, handler)` for other HTTP methods.
-* **Starting the Server**: Pass the FastMux instance to `http.ListenAndServe` to start the server.
 
 ## Limitations
 
-Since FastMux is for educational purposes, it has some limitations:
+Since FastMux is for study purposes, it has some limitations:
 * ❌ Not Production-Optimized: For production use, prefer robust routers like `chi` or `gin`.
 
 ---
@@ -106,12 +95,8 @@ Contributions are welcome! To contribute:
    ```
 5. Open a pull request
 
-Please ensure your code follows Go best practices and includes appropriate tests.
-
----
-
 ## Acknowledgments
 
-FastMux was inspired by the desire to learn more about Go's `net/http` package and to create a teaching tool for others interested in Go library design.
+FastMux was inspired by the desire to learn more about Go's `net/http` package.
 
 Thanks to the Go community for providing excellent resources and inspiration.
