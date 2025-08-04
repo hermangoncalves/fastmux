@@ -68,7 +68,7 @@ func New() *Fastmux {
 }
 
 // Handle registers a handler for a specific method and pattern
-func (r *Fastmux) Handle(method, pattern string, handler HandlerFunc) {
+func (mx *Fastmux) Handle(method, pattern string, handler HandlerFunc) {
 	if method == "" {
 		panic("method must not be empty")
 	}
@@ -81,44 +81,44 @@ func (r *Fastmux) Handle(method, pattern string, handler HandlerFunc) {
 		panic("handler must not be nil")
 	}
 
-	r.routes = append(r.routes, route{
+	mx.routes = append(mx.routes, route{
 		method:  strings.ToUpper(method),
 		pattern: pattern,
 		handler: handler,
 	})
 }
 
-func (r *Fastmux) Handler() http.Handler {
-	return r
+func (mx *Fastmux) Handler() http.Handler {
+	return mx
 }
 
 // HTTP method-specific handlers
-func (r *Fastmux) GET(pattern string, handler HandlerFunc) {
-	r.Handle(http.MethodGet, pattern, handler)
+func (mx *Fastmux) GET(pattern string, handler HandlerFunc) {
+	mx.Handle(http.MethodGet, pattern, handler)
 }
 
-func (r *Fastmux) POST(pattern string, handler HandlerFunc) {
-	r.Handle(http.MethodPost, pattern, handler)
+func (mx *Fastmux) POST(pattern string, handler HandlerFunc) {
+	mx.Handle(http.MethodPost, pattern, handler)
 }
 
-func (r *Fastmux) PUT(pattern string, handler HandlerFunc) {
-	r.Handle(http.MethodPut, pattern, handler)
+func (mx *Fastmux) PUT(pattern string, handler HandlerFunc) {
+	mx.Handle(http.MethodPut, pattern, handler)
 }
 
-func (r *Fastmux) PATCH(pattern string, handler HandlerFunc) {
-	r.Handle(http.MethodPatch, pattern, handler)
+func (mx *Fastmux) PATCH(pattern string, handler HandlerFunc) {
+	mx.Handle(http.MethodPatch, pattern, handler)
 }
 
-func (r *Fastmux) DELETE(pattern string, handler HandlerFunc) {
-	r.Handle(http.MethodDelete, pattern, handler)
+func (mx *Fastmux) DELETE(pattern string, handler HandlerFunc) {
+	mx.Handle(http.MethodDelete, pattern, handler)
 }
 
-func (r *Fastmux) HEAD(pattern string, handler HandlerFunc) {
-	r.Handle(http.MethodHead, pattern, handler)
+func (mx *Fastmux) HEAD(pattern string, handler HandlerFunc) {
+	mx.Handle(http.MethodHead, pattern, handler)
 }
 
-func (r *Fastmux) OPTIONS(pattern string, handler HandlerFunc) {
-	r.Handle(http.MethodOptions, pattern, handler)
+func (mx *Fastmux) OPTIONS(pattern string, handler HandlerFunc) {
+	mx.Handle(http.MethodOptions, pattern, handler)
 }
 
 // matchRoute checks if a pattern matches a path and extracts parameters
@@ -147,11 +147,11 @@ func matchRoute(pattern, path string) (bool, []Param) {
 }
 
 // ServeHTTP implements the http.Handler interface
-func (r *Fastmux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (mx *Fastmux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	reqMethod := req.Method
 	reqPath := req.URL.Path
 
-	for _, route := range r.routes {
+	for _, route := range mx.routes {
 		if route.method != reqMethod {
 			continue
 		}
@@ -163,13 +163,13 @@ func (r *Fastmux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	ctx := &Context{ResponseWriter: w, Request: req, Params: nil}
-	r.notFound(ctx)
+	mx.notFound(ctx)
 }
 
-func (r *Fastmux) Run(addr string) error {
+func (mx *Fastmux) Run(addr string) error {
 	address := resolveAddress(addr)
 	debugPrint("Server running on %s", address)
-	return http.ListenAndServe(address, r.Handler())
+	return http.ListenAndServe(address, mx.Handler())
 }
 
 func resolveAddress(addr string) string {
