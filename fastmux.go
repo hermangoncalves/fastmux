@@ -86,6 +86,10 @@ func (r *Fastmux) Handle(method, pattern string, handler HandlerFunc) {
 	})
 }
 
+func (r *Fastmux) Handler() http.Handler {
+	return r
+}
+
 // HTTP method-specific handlers
 func (r *Fastmux) GET(pattern string, handler HandlerFunc) {
 	r.Handle(http.MethodGet, pattern, handler)
@@ -160,10 +164,17 @@ func (r *Fastmux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	r.notFound(ctx)
 }
 
+func (r *Fastmux) PrintRoutes() {
+	fmt.Println("Registered routes:")
+	for _, route := range r.routes {
+		fmt.Printf("\t[%s] %s\n", route.method, route.pattern)
+	}
+}
 func (r *Fastmux) Run(addr string) error {
 	address := resolveAddress(addr)
+	r.PrintRoutes()
 	fmt.Printf("Listening and serving HTTP on %s\n", address)
-	return http.ListenAndServe(address, nil)
+	return http.ListenAndServe(address, r.Handler())
 }
 
 func resolveAddress(addr string) string {
