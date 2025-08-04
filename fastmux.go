@@ -59,7 +59,7 @@ func New() *Fastmux {
 		routes: make([]route, 0),
 		notFound: func(ctx *Context) {
 			ctx.JSON(http.StatusNotFound, map[string]string{
-				"error": "not found",
+				"error": "page not found",
 			})
 		},
 	}
