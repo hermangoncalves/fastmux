@@ -2,7 +2,9 @@ package fastmux
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -156,4 +158,22 @@ func (r *Fastmux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	ctx := &Context{ResponseWriter: w, Request: req, Params: nil}
 	r.notFound(ctx)
+}
+
+func (r *Fastmux) Run(addr string) error {
+	address := resolveAddress(addr)
+	fmt.Printf("Listening and serving HTTP on %s\n", address)
+	return http.ListenAndServe(address, nil)
+}
+
+func resolveAddress(addr string) string {
+	switch addr {
+	case "":
+		if port := os.Getenv("PORT"); port != "" {
+			return fmt.Sprintf(":%s", port)
+		}
+		return ":8081"
+	default:
+		return addr
+	}
 }
